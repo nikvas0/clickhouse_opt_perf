@@ -108,7 +108,7 @@ for n, m in tests:
         print('RESULT NO     :', ch.run(query))
 
         # graph opt
-        query += 'SETTINGS convert_query_to_cnf = 1, optimize_using_constraints = 1, optimize_substitute_columns = 1, optimize_append_index = 1'
+        query += 'SETTINGS convert_query_to_cnf = 1, optimize_using_constraints = 1, optimize_substitute_columns = 1'
         print('Query ', query)
         min_times_graph_opt[-1].append(round(getMinTime(query, T), 3))
         print('RESULT GRAPH  :', ch.run(query))
