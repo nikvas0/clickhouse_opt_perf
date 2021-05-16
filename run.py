@@ -1,12 +1,13 @@
 import subprocess
 import json
 import random
+import time
 
 class ClickHouse:
     # https://github.com/nikvas0/CHDataSkippingTest/blob/master/indices_test.ipynb
     def __init__(self, binary_path_):
         self.bin_path = binary_path_
-    
+
     def run(self, query, use_json=True, silent=True):
         cmd = [self.bin_path, '-q', query, '-f', 'JSON']
         #print(cmd)
@@ -21,7 +22,12 @@ class ClickHouse:
 def getTimes(count, query):
     result = []
     for _ in range(count):
-        result.append(ch.run(query)['statistics']['elapsed'])
+        start = time.time()
+        ch.run(query, use_json=True, silent=True)
+        end = time.time()
+        print(end - start)
+        result.append(end - start)
+    #print(result)
     return result
 
 def getMinTime(query, count):
@@ -63,7 +69,7 @@ def genRandomQuery(n, d, a, name, settings):
     return res
 
 
-tests = [(100, 150), (800, 1000)] # столбцов и ограничений 
+tests = [(100, 150), (200, 300), (500, 600), (800, 1000)] # столбцов и ограничений 
 
 D = 20 # дизъюнктов
 A = 5 # атомарных формул
@@ -99,19 +105,21 @@ for n, m in tests:
         # no opt
         print('Query ', query)
         min_times_no_opt[-1].append(getMinTime(query, T))
+        print('RESULT NO     :', ch.run(query))
 
         # graph opt
         query += 'SETTINGS convert_query_to_cnf = 1, optimize_using_constraints = 1, optimize_substitute_columns = 1, optimize_append_index = 1'
         print('Query ', query)
         min_times_graph_opt[-1].append(getMinTime(query, T))
+        print('RESULT GRAPH  :', ch.run(query))
 
         # z3 opt
         query += ', optimize_using_smt = 1'
         print('Query ', query)
         min_times_z3_opt[-1].append(getMinTime(query, T))
 
+        print('RESULT SMT    :', ch.run(query))
 
-        print('RESULT:', ch.run(query))
 
 print("NO OPTIMIZATION:", min_times_no_opt)
 print("GRAPH OPTIMIZATION:", min_times_graph_opt)
