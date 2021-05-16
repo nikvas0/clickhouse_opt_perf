@@ -69,7 +69,7 @@ def genRandomQuery(n, d, a, name, settings):
     return res
 
 
-tests = [(100, 150), (200, 300), (500, 600), (800, 1000)] # столбцов и ограничений 
+tests = [(100, 50), (100, 100), (100, 150), (200, 300), (500, 600), (800, 1000)] # столбцов и ограничений 
 
 D = 20 # дизъюнктов
 A = 5 # атомарных формул
@@ -104,19 +104,19 @@ for n, m in tests:
 
         # no opt
         print('Query ', query)
-        min_times_no_opt[-1].append(getMinTime(query, T))
+        min_times_no_opt[-1].append(round(getMinTime(query, T), 3))
         print('RESULT NO     :', ch.run(query))
 
         # graph opt
         query += 'SETTINGS convert_query_to_cnf = 1, optimize_using_constraints = 1, optimize_substitute_columns = 1, optimize_append_index = 1'
         print('Query ', query)
-        min_times_graph_opt[-1].append(getMinTime(query, T))
+        min_times_graph_opt[-1].append(round(getMinTime(query, T), 3))
         print('RESULT GRAPH  :', ch.run(query))
 
         # z3 opt
         query += ', optimize_using_smt = 1'
         print('Query ', query)
-        min_times_z3_opt[-1].append(getMinTime(query, T))
+        min_times_z3_opt[-1].append(round(getMinTime(query, T), 3))
 
         print('RESULT SMT    :', ch.run(query))
 
